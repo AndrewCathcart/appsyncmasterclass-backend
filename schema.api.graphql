@@ -1,6 +1,6 @@
 schema {
-  query: query
-  mutation: mutation
+  query: Query
+  mutation: Mutation
 }
 
 type Query {
