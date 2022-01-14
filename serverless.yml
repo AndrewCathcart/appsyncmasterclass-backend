@@ -8,6 +8,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
+  region: eu-west-1
 
 package:
   exclude:
@@ -17,3 +18,7 @@ package:
 custom:
   appSync:
     - ${file(serverless.appsync-api.yml)}
+
+resources:
+  - ${file(resources/cognito/cognito-user-pool.yml)}
+  - ${file(resources/cognito/cognito-user-pool-client.yml)}
