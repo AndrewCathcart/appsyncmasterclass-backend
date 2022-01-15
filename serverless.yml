@@ -3,12 +3,17 @@ frameworkVersion: "2"
 
 plugins:
   - serverless-appsync-plugin
+  - serverless-iam-roles-per-function
 
 provider:
   name: aws
   runtime: nodejs12.x
-  lambdaHashingVersion: 20201221
+  stage: ${opt:stage, 'dev'}
   region: eu-west-1
+  lambdaHashingVersion: 20201221
+  environment:
+    NODE_ENV: ${self:provider.stage}
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
 
 package:
   exclude:
@@ -22,3 +27,8 @@ custom:
 resources:
   - ${file(resources/cognito/cognito-user-pool.yml)}
   - ${file(resources/cognito/cognito-user-pool-client.yml)}
+
+  - ${file(resources/dynamodb/users-table.yml)}
+
+functions:
+  - ${file(src/handlers/confirm-user-signup/config.yml)}
