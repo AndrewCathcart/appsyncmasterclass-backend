@@ -1,8 +1,8 @@
-import DynamoDB from "aws-sdk/clients/dynamodb";
+import AWS from "aws-sdk";
 import Chance from "chance";
 
 const chance = new Chance();
-const DocumentClient = new DynamoDB.DocumentClient();
+const ddb = new AWS.DynamoDB.DocumentClient();
 
 export const handler = async (event) => {
   if (event.triggerSource === "PostConfirmation_ConfirmSignUp") {
@@ -24,11 +24,13 @@ export const handler = async (event) => {
       likesCount: 0,
     };
 
-    await DocumentClient.put({
-      TableName: process.env.USERS_TABLE,
-      Item: user,
-      ConditionExpression: "attribute_not_exists(id)",
-    }).promise();
+    await ddb
+      .put({
+        TableName: process.env.USERS_TABLE,
+        Item: user,
+        ConditionExpression: "attribute_not_exists(id)",
+      })
+      .promise();
 
     return event;
   } else {

@@ -1,7 +1,5 @@
 confirmUserSignup:
   handler: src/handlers/confirm-user-signup/handler.handler
-  environment:
-    USERS_TABLE: !Ref UsersTable
   iamRoleStatements:
     - Effect: "Allow"
       Action: dynamodb:PutItem

@@ -32,3 +32,5 @@ Resources:
 Outputs:
   CognitoUserPoolId:
     Value: !Ref CognitoUserPool
+  AwsRegion:
+    Value: ${self:provider.region}

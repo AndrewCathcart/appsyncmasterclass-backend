@@ -4,31 +4,34 @@ frameworkVersion: "2"
 plugins:
   - serverless-appsync-plugin
   - serverless-iam-roles-per-function
+  - serverless-export-env
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
   lambdaHashingVersion: 20201221
   environment:
     NODE_ENV: ${self:provider.stage}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    USERS_TABLE: !Ref UsersTable
 
 package:
-  exclude:
-    - package-lock.json
-    - package.json
+  individually: true
 
 custom:
   appSync:
-    - ${file(serverless.appsync-api.yml)}
+    - ${file(src/resources/appsync/appsync-api.yml)}
+  export-env:
+    overwrite: true
 
 resources:
-  - ${file(resources/cognito/cognito-user-pool.yml)}
-  - ${file(resources/cognito/cognito-user-pool-client.yml)}
+  - ${file(src/resources/cognito/cognito-user-pool.yml)}
+  - ${file(src/resources/cognito/cognito-user-pool-client.yml)}
 
-  - ${file(resources/dynamodb/users-table.yml)}
+  - ${file(src/resources/dynamodb/users-table.yml)}
+
 
 functions:
   - ${file(src/handlers/confirm-user-signup/config.yml)}
