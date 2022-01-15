@@ -16,7 +16,7 @@ export const handler = async (event) => {
     const user = {
       id: event.userName,
       name,
-      screenName: `${name.replace(/[^a-zA-Z0-9]/g, "")}${suffix})`,
+      screenName: `${name.replace(/[^a-zA-Z0-9]/g, "")}${suffix}`,
       createdAt: new Date().toJSON(),
       followersCount: 0,
       followingCount: 0,
