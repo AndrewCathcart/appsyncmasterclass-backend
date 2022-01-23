@@ -1,5 +1,9 @@
 import { create as createVelocityUtils } from "amplify-appsync-simulator/lib/velocity/util";
+import AWS from "aws-sdk";
 import Chance from "chance";
+import { config } from "dotenv";
+
+config();
 
 const chance = new Chance();
 
@@ -38,7 +42,56 @@ const an_appsync_context = (identity, args) => {
   };
 };
 
+const an_authenticated_user = async () => {
+  const { name, email, password } = a_random_user();
+
+  const cognito = new AWS.CognitoIdentityServiceProvider();
+
+  const res = await cognito
+    .signUp({
+      ClientId: process.env.WEB_COGNITO_USER_POOL_CLIENT_ID,
+      Username: email,
+      Password: password,
+      UserAttributes: [{ Name: "name", Value: name }],
+    })
+    .promise();
+
+  const username = res.UserSub;
+  console.log(`${email} has signed up - username: ${username}`);
+
+  await cognito
+    .adminConfirmSignUp({
+      UserPoolId: process.env.COGNITO_USER_POOL_ID,
+      Username: username,
+    })
+    .promise();
+
+  console.log(`${email} has confirmed signup`);
+
+  const auth = await cognito
+    .initiateAuth({
+      AuthFlow: "USER_PASSWORD_AUTH",
+      ClientId: process.env.WEB_COGNITO_USER_POOL_CLIENT_ID,
+      AuthParameters: {
+        USERNAME: username,
+        PASSWORD: password,
+      },
+    })
+    .promise();
+
+  console.log(`[${email}] - signed in`);
+
+  return {
+    username,
+    name,
+    email,
+    idToken: auth.AuthenticationResult.IdToken,
+    accessToken: auth.AuthenticationResult.AccessToken,
+  };
+};
+
 export default {
   a_random_user,
   an_appsync_context,
+  an_authenticated_user,
 };

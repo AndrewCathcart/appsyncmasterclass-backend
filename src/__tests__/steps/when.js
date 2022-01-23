@@ -4,6 +4,7 @@ import AWS from "aws-sdk";
 import { config } from "dotenv";
 import fs from "fs";
 import { handler as confirmUserSignup } from "../../handlers/confirm-user-signup/handler";
+import GraphQL from "../lib/graphql";
 
 config();
 
@@ -72,8 +73,43 @@ const we_invoke_an_appsync_template = (templatePath, context) => {
   return JSON.parse(compiler.render(context));
 };
 
+const a_user_calls_getMyProfile = async (user) => {
+  console.log(user);
+  const getMyProfile = `query getMyProfile {
+    getMyProfile {
+      createdAt
+      backgroundImageUrl
+      bio
+      birthdate
+      followersCount
+      followingCount
+      id
+      imageUrl
+      likesCount
+      location
+      name
+      screenName
+      website
+      tweetsCount
+    }
+  }`;
+
+  const data = await GraphQL(
+    process.env.API_URL,
+    getMyProfile,
+    {},
+    user.accessToken
+  );
+  const profile = data.getMyProfile;
+
+  console.log(`[${user.username}] - fetched profile`);
+
+  return profile;
+};
+
 export default {
   we_invoke_confirmUserSignup,
   a_user_signs_up,
   we_invoke_an_appsync_template,
+  a_user_calls_getMyProfile,
 };

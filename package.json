@@ -9,8 +9,8 @@
     "sls": "sls",
     "exportEnv": "sls export-env",
     "test": "jest --verbose ./src/__tests__/test_cases/unit",
-    "test:integration": "sls export-env && jest --verbose ./src/__tests__/test_cases/integration",
-    "test:e2e": "sls export-env && jest --verbose ./src/__tests__/test_cases/e2e"
+    "test:integration": "jest --verbose ./src/__tests__/test_cases/integration",
+    "test:e2e": "jest --verbose ./src/__tests__/test_cases/e2e"
   },
   "repository": {
     "type": "git",
@@ -28,8 +28,10 @@
     "@types/jest": "^27.4.0",
     "amplify-appsync-simulator": "^2.3.6",
     "amplify-velocity-template": "^1.4.6",
+    "axios": "^0.25.0",
     "dotenv": "^12.0.1",
     "jest": "^27.4.7",
+    "lodash": "^4.17.21",
     "serverless": "^2.71.0",
     "serverless-appsync-plugin": "^1.12.1",
     "serverless-export-env": "^1.4.4",
