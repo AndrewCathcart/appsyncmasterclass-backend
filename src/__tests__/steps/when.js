@@ -1,5 +1,8 @@
+import { map as velocityMapper } from "amplify-appsync-simulator/lib/velocity/value-mapper/mapper";
+import velocityTemplate from "amplify-velocity-template";
 import AWS from "aws-sdk";
 import { config } from "dotenv";
+import fs from "fs";
 import { handler as confirmUserSignup } from "../../handlers/confirm-user-signup/handler";
 
 config();
@@ -59,7 +62,18 @@ const a_user_signs_up = async (name, email, password) => {
   };
 };
 
+const we_invoke_an_appsync_template = (templatePath, context) => {
+  const template = fs.readFileSync(templatePath, { encoding: "utf-8" });
+  const ast = velocityTemplate.parse(template);
+  const compiler = new velocityTemplate.Compile(ast, {
+    valueMapper: velocityMapper,
+    escape: false,
+  });
+  return JSON.parse(compiler.render(context));
+};
+
 export default {
   we_invoke_confirmUserSignup,
   a_user_signs_up,
+  we_invoke_an_appsync_template,
 };

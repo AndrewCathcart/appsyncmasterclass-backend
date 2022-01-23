@@ -1,3 +1,4 @@
+import { create as createVelocityUtils } from "amplify-appsync-simulator/lib/velocity/util";
 import Chance from "chance";
 
 const chance = new Chance();
@@ -21,6 +22,23 @@ const a_random_user = () => {
   };
 };
 
+const an_appsync_context = (identity, args) => {
+  const util = createVelocityUtils([], new Date(), Object());
+  const context = {
+    identity,
+    args,
+    arguments: args,
+  };
+
+  return {
+    context,
+    ctx: context,
+    util,
+    utils: util,
+  };
+};
+
 export default {
   a_random_user,
+  an_appsync_context,
 };
