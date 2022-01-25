@@ -4,6 +4,7 @@ import AWS from "aws-sdk";
 import { config } from "dotenv";
 import fs from "fs";
 import { handler as confirmUserSignup } from "../../handlers/confirm-user-signup/handler";
+import { handler as getImageUploadUrl } from "../../handlers/get-image-upload-url/handler";
 import GraphQL from "../lib/graphql";
 
 config();
@@ -30,6 +31,25 @@ const we_invoke_confirmUserSignup = async (username, name, email) => {
 
   const context = {};
   await confirmUserSignup(event, context);
+};
+
+const we_invoke_getImageUploadUrl = async (
+  username,
+  extension,
+  contentType
+) => {
+  const context = {};
+  const event = {
+    identity: {
+      username,
+    },
+    arguments: {
+      extension,
+      contentType,
+    },
+  };
+
+  return await getImageUploadUrl(event, context);
 };
 
 const a_user_signs_up = async (name, email, password) => {
@@ -74,7 +94,6 @@ const we_invoke_an_appsync_template = (templatePath, context) => {
 };
 
 const a_user_calls_getMyProfile = async (user) => {
-  console.log(user);
   const getMyProfile = `query getMyProfile {
     getMyProfile {
       createdAt
@@ -108,7 +127,6 @@ const a_user_calls_getMyProfile = async (user) => {
 };
 
 const a_user_calls_editMyProfile = async (user, input) => {
-  console.log(user);
   const editMyProfile = `mutation editMyProfile($input: ProfileInput!) {
     editMyProfile(newProfile: $input) {
       createdAt
@@ -144,10 +162,34 @@ const a_user_calls_editMyProfile = async (user, input) => {
   return profile;
 };
 
+const a_user_calls_getImageUploadUrl = async (user, extension, contentType) => {
+  const getImageUploadUrl = `query getImageUploadUrl($extension: String, $contentType: String) {
+    getImageUploadUrl(extension: $extension, contentType: $contentType)
+  }`;
+  const variables = {
+    extension,
+    contentType,
+  };
+
+  const data = await GraphQL(
+    process.env.API_URL,
+    getImageUploadUrl,
+    variables,
+    user.accessToken
+  );
+  const url = data.getImageUploadUrl;
+
+  console.log(`[${user.username}] - got image upload url`);
+
+  return url;
+};
+
 export default {
   we_invoke_confirmUserSignup,
   a_user_signs_up,
   we_invoke_an_appsync_template,
   a_user_calls_getMyProfile,
   a_user_calls_editMyProfile,
+  we_invoke_getImageUploadUrl,
+  a_user_calls_getImageUploadUrl,
 };

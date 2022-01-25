@@ -1,0 +1,8 @@
+getImageUploadUrl:
+  handler: src/handlers/get-image-upload-url/handler.handler
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action: 
+        - s3:PutObject
+        - s3:PutObjectAcl
+      Resource: !Sub ${AssetsBucket.Arn}/*

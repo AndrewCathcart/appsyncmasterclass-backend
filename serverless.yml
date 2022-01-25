@@ -17,13 +17,14 @@ provider:
     NODE_ENV: ${self:provider.stage}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     USERS_TABLE: !Ref UsersTable
+    BUCKET_NAME: !Ref AssetsBucket
 
 package:
   individually: true
 
 custom:
   appSync:
-    - ${file(src/resources/appsync/appsync-api.yml)}
+    - ${file(serverless.appsync-api.yml)}
   export-env:
     overwrite: true
   manifest:
@@ -38,6 +39,9 @@ resources:
 
   - ${file(src/resources/dynamodb/users-table.yml)}
 
+  - ${file(src/resources/s3/assets-bucket.yml)}
 
 functions:
   - ${file(src/handlers/confirm-user-signup/config.yml)}
+  - ${file(src/handlers/get-image-upload-url/config.yml)}
+

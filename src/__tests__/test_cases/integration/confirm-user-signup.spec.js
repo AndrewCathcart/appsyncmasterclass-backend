@@ -12,7 +12,6 @@ describe("when confirm-user-signup runs", () => {
     await when.we_invoke_confirmUserSignup(username, name, email);
 
     const ddbUser = await then.user_exists_in_UsersTable(username);
-    console.log(ddbUser);
     expect(ddbUser).toMatchObject({
       id: username,
       name,

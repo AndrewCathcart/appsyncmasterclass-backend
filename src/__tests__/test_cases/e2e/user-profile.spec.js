@@ -1,6 +1,11 @@
 import Chance from "chance";
+import { config } from "dotenv";
+import path from "path";
 import given from "../../steps/given";
+import then from "../../steps/then";
 import when from "../../steps/when";
+
+config();
 
 const chance = new Chance();
 
@@ -34,6 +39,25 @@ describe("given an authenticated user", () => {
     const [firstName, lastName] = profile.name.split(" ");
     expect(profile.screenName).toContain(firstName);
     expect(profile.screenName).toContain(lastName);
+  });
+
+  it("the user can retrieve a URL to upload their new profile image", async () => {
+    const uploadUrl = await when.a_user_calls_getImageUploadUrl(
+      user,
+      ".png",
+      "image/png"
+    );
+    const { BUCKET_NAME } = process.env;
+    const regex = new RegExp(
+      `https://${BUCKET_NAME}.s3-accelerate.amazonaws.com/${user.username}/.*\.png\?.*Content-Type=image%2Fpng.*`
+    );
+    expect(uploadUrl).toMatch(regex);
+
+    const filePath = path.join(__dirname, "../../data/logo.png");
+    await then.user_can_upload_image_to_url(uploadUrl, filePath, "image/png");
+
+    const downloadUrl = uploadUrl.split("?")[0];
+    await then.user_can_download_image_from(downloadUrl);
   });
 
   it("the user can edit their profile with editMyProfile", async () => {
